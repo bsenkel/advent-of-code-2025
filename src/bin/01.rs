@@ -13,9 +13,31 @@ pub fn part_one(input: &str) -> Option<u64> {
         })
         .collect();
 
-    println!("Number of lines: {}", commands.len());
+    println!("Number of input lines: {}", commands.len());
 
-    Some(0)
+    let mut position: i32 = 50; // start
+    let mut count_zero: u64 = 0;
+
+    for (direction, steps) in commands {
+        match direction {
+            "R" => position += steps,
+            "L" => position -= steps,
+            _ => {}
+        }
+
+        while position > 99 {
+            position -= 100;
+        }
+        while position < 0 {
+            position += 100;
+        }
+
+        if position == 0 {
+            count_zero += 1;
+        }
+    }
+
+    Some(count_zero)
 }
 
 pub fn part_two(input: &str) -> Option<u64> {
