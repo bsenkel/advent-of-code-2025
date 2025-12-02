@@ -13,8 +13,6 @@ pub fn part_one(input: &str) -> Option<u64> {
         })
         .collect();
 
-    println!("Number of input lines: {}", commands.len());
-
     let mut position: i32 = 50; // start
     let mut count_zero: u64 = 0;
 
@@ -64,13 +62,12 @@ pub fn part_two(input: &str) -> Option<u64> {
                 _ => {}
             }
 
-            while position > 99 {
+            if position > 99 {
                 position = 0;
             }
-            while position < 0 {
+            if position < 0 {
                 position = 99;
             }
-
             if position == 0 {
                 count_zero += 1;
             }
