@@ -24,7 +24,41 @@ pub fn part_one(input: &str) -> Option<u64> {
 }
 
 pub fn part_two(input: &str) -> Option<u64> {
-    None
+    let segments: Vec<&str> = input.split(',').collect();
+    let mut sum: u64 = 0;
+
+    for segment in segments {
+        let range: Vec<&str> = segment.split('-').collect();
+        let first_id = range[0].parse::<u64>();
+        let last_id = range[1].parse::<u64>();
+
+        for i in first_id.unwrap_or_default()..=last_id.unwrap_or_default() {
+            let digits = i.to_string();
+            let len = digits.len();
+
+            for pattern_len in 1..=len / 2 {
+                let pattern = &digits[0..pattern_len];
+                let mut pos = 0;
+                let mut count = 0;
+
+                while pos + pattern_len <= len {
+                    if &digits[pos..pos + pattern_len] == pattern {
+                        count += 1;
+                        pos += pattern_len;
+                    } else {
+                        break;
+                    }
+                }
+
+                if count >= 2 && pos == len {
+                    sum += i;
+                    break;
+                }
+            }
+        }
+    }
+
+    Some(sum)
 }
 
 #[cfg(test)]
