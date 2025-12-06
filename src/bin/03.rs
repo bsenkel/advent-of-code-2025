@@ -1,11 +1,7 @@
 advent_of_code::solution!(3);
 
 pub fn part_one(input: &str) -> Option<u64> {
-    // notes:
-    // * in each line of input (= a battery bank) exactly two batteries need to be turned on
-    // * battery bank joltage = digits of the turned on batteries, max. 2 digits, strict order, position can not be changed
-    // * iterate through each line, find the largest single digit, check right and left neighbors‚ if available...
-    // * total output joltage = sum of maximum joltage from each bank
+    let mut max_joltage: u64 = 0;
 
     for line in input.lines().filter_map(|l| {
         if l.is_empty() {
@@ -14,26 +10,52 @@ pub fn part_one(input: &str) -> Option<u64> {
         Some(l)
     }) {
         let digits = line;
-        let mut max_digit = 0;
-        let mut max_pos = 0;
-        let mut count = 0;
+        let len = digits.len();
+        let mut digit1 = u32::MIN;
+        let mut digit1_pos = 0;
+        let mut digit2 = u32::MIN;
+        let mut digit2_pos = 0;
 
-        for digit in digits.chars() {
+        for (index, digit) in digits.chars().enumerate() {
             let number = digit.to_digit(10).unwrap();
-            if count == 0 {
-                max_digit = number;
+            if number > digit1 {
+                digit1 = number;
+                digit1_pos = index;
             }
-            if number > max_digit {
-                max_digit = number;
-                max_pos = count;
-            }
-            count += 1;
         }
 
-        println!("Found max val: {} at position {}", max_digit, max_pos);
+        // iterate to the right side
+        if digit1_pos < len - 1 {
+            for (index, digit) in digits[digit1_pos + 1..len].chars().enumerate() {
+                let number = digit.to_digit(10).unwrap();
+                if number > digit2 {
+                    digit2 = number;
+                    digit2_pos = index + digit1_pos + 1;
+                }
+            }
+        } else {
+            // iterate to the left side
+            for (index, digit) in digits[0..digit1_pos].chars().rev().enumerate() {
+                let number = digit.to_digit(10).unwrap();
+                if number > digit2 {
+                    digit2 = number;
+                    digit2_pos = digit1_pos - 1 - index;
+                }
+            }
+        }
+
+        let result;
+        if digit1_pos < digit2_pos {
+            result = format!("{}{}", digit1, digit2);
+        } else {
+            result = format!("{}{}", digit2, digit1);
+        }
+
+        let joltage: u64 = result.parse().unwrap();
+        max_joltage += joltage;
     }
 
-    Some(0)
+    Some(max_joltage)
 }
 
 pub fn part_two(input: &str) -> Option<u64> {
