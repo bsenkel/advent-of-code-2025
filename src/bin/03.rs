@@ -1,3 +1,5 @@
+use std::u32;
+
 advent_of_code::solution!(3);
 
 pub fn part_one(input: &str) -> Option<u64> {
@@ -59,7 +61,49 @@ pub fn part_one(input: &str) -> Option<u64> {
 }
 
 pub fn part_two(input: &str) -> Option<u64> {
-    None
+    let mut max_joltage: u64 = 0;
+
+    for line in input.lines().filter_map(|l| {
+        if l.is_empty() {
+            return None;
+        }
+        Some(l)
+    }) {
+        let digits = line;
+        let len = digits.len();
+
+        let mut start = 0;
+        let mut values: Vec<u32> = Vec::new();
+
+        for i in (0..12).rev() {
+            let mut max = u32::MIN;
+            let mut max_pos = start;
+
+            let end = len - i;
+
+            if start >= end {
+                break;
+            }
+
+            for (index, digit) in digits[start..end].chars().enumerate() {
+                let number = digit.to_digit(10).unwrap();
+                if number > max {
+                    max = number;
+                    max_pos = start + index;
+                }
+            }
+
+            values.push(max);
+            start = max_pos + 1;
+        }
+
+        let result: String = values.iter().map(|v| v.to_string()).collect();
+
+        let joltage: u64 = result.parse().unwrap();
+        max_joltage += joltage;
+    }
+
+    Some(max_joltage)
 }
 
 #[cfg(test)]
@@ -75,6 +119,6 @@ mod tests {
     #[test]
     fn test_part_two() {
         let result = part_two(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, None);
+        assert_eq!(result, Some(3121910778619));
     }
 }
