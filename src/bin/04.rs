@@ -48,7 +48,59 @@ pub fn part_one(input: &str) -> Option<u64> {
 }
 
 pub fn part_two(input: &str) -> Option<u64> {
-    None
+    let mut grid: Vec<Vec<char>> = input.lines().map(|line| line.chars().collect()).collect();
+    let mut paper_rolls_removed = 0;
+    let mut paper_rolls_accessible = true;
+
+    while paper_rolls_accessible {
+        paper_rolls_accessible = false;
+        for row in 0..grid.len() {
+            for col in 0..grid[row].len() {
+                let cell = grid[row][col];
+                if cell == '.' || cell == 'x' {
+                    continue;
+                }
+
+                let mut paper_rolls = 0;
+
+                if row > 0 && col > 0 && grid[row - 1][col - 1] == '@' {
+                    paper_rolls += 1;
+                }
+                if row > 0 && grid[row - 1][col] == '@' {
+                    paper_rolls += 1;
+                }
+                if row > 0 && col + 1 < grid[row].len() && grid[row - 1][col + 1] == '@' {
+                    paper_rolls += 1;
+                }
+                if col > 0 && grid[row][col - 1] == '@' {
+                    paper_rolls += 1;
+                }
+                if col + 1 < grid[row].len() && grid[row][col + 1] == '@' {
+                    paper_rolls += 1;
+                }
+                if row + 1 < grid.len() && col > 0 && grid[row + 1][col - 1] == '@' {
+                    paper_rolls += 1;
+                }
+                if row + 1 < grid.len() && grid[row + 1][col] == '@' {
+                    paper_rolls += 1;
+                }
+                if row + 1 < grid.len()
+                    && col + 1 < grid[row].len()
+                    && grid[row + 1][col + 1] == '@'
+                {
+                    paper_rolls += 1;
+                }
+
+                if paper_rolls < 4 {
+                    grid[row][col] = 'x';
+                    paper_rolls_removed += 1;
+                    paper_rolls_accessible = true;
+                }
+            }
+        }
+    }
+
+    Some(paper_rolls_removed)
 }
 
 #[cfg(test)]
@@ -64,6 +116,6 @@ mod tests {
     #[test]
     fn test_part_two() {
         let result = part_two(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, None);
+        assert_eq!(result, Some(43));
     }
 }
