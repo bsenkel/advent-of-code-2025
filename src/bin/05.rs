@@ -2,14 +2,21 @@ advent_of_code::solution!(5);
 
 pub fn part_one(input: &str) -> Option<u64> {
     let mut fresh_ingredient_ranges = Vec::<&str>::new();
+    let mut ingredient_ids = Vec::<u64>::new();
+    let mut separator = false;
 
     for line in input.lines() {
-        if !line.is_empty() {
+        if !separator {
             fresh_ingredient_ranges.push(line);
-        } else {
-            // start here to process available ingredient IDs
-            // ...
         }
+        if line.is_empty() {
+            separator = true;
+            continue;
+        }
+
+        // start here to process available ingredient IDs
+        ingredient_ids.push(line.parse::<u64>().unwrap());
+        // ...
     }
 
     Some(0)
