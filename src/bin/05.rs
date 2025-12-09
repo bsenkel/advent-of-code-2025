@@ -20,6 +20,30 @@ impl Range {
     }
 }
 
+fn merge_ranges(mut ranges: Vec<Range>) -> Vec<Range> {
+    if ranges.is_empty() {
+        return ranges;
+    }
+
+    ranges.sort();
+
+    let mut merged = vec![ranges[0]];
+
+    for current in ranges.iter().skip(1) {
+        let last = merged.last_mut().unwrap();
+
+        // merge, if they overlap or are neighbors
+        if current.start <= last.end + 1 {
+            last.end = last.end.max(current.end);
+        } else {
+            // or add new range
+            merged.push(*current);
+        }
+    }
+
+    merged
+}
+
 pub fn part_one(input: &str) -> Option<u64> {
     let mut fresh_ingredient_ranges = vec![];
     let mut ingredient_ids = Vec::<u64>::new();
@@ -42,27 +66,12 @@ pub fn part_one(input: &str) -> Option<u64> {
         }
     }
 
-    // TODO: sort ranges and merge
-    fresh_ingredient_ranges.sort();
-
-    println!("{:?}", fresh_ingredient_ranges);
-    println!("Lines: {}", fresh_ingredient_ranges.len());
-
-    println!("{:?}", ingredient_ids);
-    println!("Lines: {}", ingredient_ids.len());
+    let merged = merge_ranges(fresh_ingredient_ranges);
 
     for id in ingredient_ids {
-        let mut found = false;
-        for range in fresh_ingredient_ranges.iter() {
-            for i in range.start..=range.end {
-                if i == id {
-                    fresh_count += 1;
-                    found = true;
-                    break;
-                }
-            }
-            if found {
-                break;
+        for range in merged.iter() {
+            if id >= range.start && id <= range.end {
+                fresh_count += 1;
             }
         }
     }
