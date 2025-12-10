@@ -32,7 +32,7 @@ fn merge_ranges(mut ranges: Vec<Range>) -> Vec<Range> {
     for current in ranges.iter().skip(1) {
         let last = merged.last_mut().unwrap();
 
-        // merge, if they overlap or are neighbors
+        // merge, if they overlap or are direct neighbors
         if current.start <= last.end + 1 {
             last.end = last.end.max(current.end);
         } else {
@@ -80,7 +80,25 @@ pub fn part_one(input: &str) -> Option<u64> {
 }
 
 pub fn part_two(input: &str) -> Option<u64> {
-    None
+    let mut fresh_ingredient_ranges = vec![];
+    let mut fresh_count = 0;
+
+    for line in input.lines() {
+        if line.is_empty() {
+            break;
+        }
+        if let Ok(range) = Range::from_str(line) {
+            fresh_ingredient_ranges.push(range);
+        }
+    }
+
+    let merged = merge_ranges(fresh_ingredient_ranges);
+
+    for range in merged.iter() {
+        fresh_count += range.end - range.start + 1;
+    }
+
+    Some(fresh_count)
 }
 
 #[cfg(test)]
@@ -96,6 +114,6 @@ mod tests {
     #[test]
     fn test_part_two() {
         let result = part_two(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, None);
+        assert_eq!(result, Some(14));
     }
 }
