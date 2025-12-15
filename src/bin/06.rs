@@ -1,5 +1,3 @@
-use std::num;
-
 advent_of_code::solution!(6);
 
 enum Operation {
@@ -46,7 +44,63 @@ pub fn part_one(input: &str) -> Option<u64> {
 }
 
 pub fn part_two(input: &str) -> Option<u64> {
-    None
+    let (operands, operators) = input.trim_end().rsplit_once("\n")?;
+
+    let char_matrix: Vec<Vec<char>> = operands
+        .lines()
+        .map(|line| line.chars().collect())
+        .collect();
+
+    let num_cols = char_matrix.iter().map(|row| row.len()).max().unwrap_or(0);
+    let mut transposed: Vec<String> = Vec::new();
+
+    for col_idx in 0..num_cols {
+        let column: String = char_matrix
+            .iter()
+            .filter_map(|row| row.get(col_idx).copied())
+            .collect();
+        transposed.push(column);
+    }
+
+    let operator_list: Vec<&str> = operators.split_whitespace().collect();
+
+    let mut groups: Vec<Vec<String>> = Vec::new();
+    let mut current_group: Vec<String> = Vec::new();
+
+    for trans_line in transposed {
+        if trans_line.trim().is_empty() {
+            if !current_group.is_empty() {
+                groups.push(current_group);
+                current_group = Vec::new();
+            }
+        } else {
+            current_group.push(trans_line);
+        }
+    }
+    if !current_group.is_empty() {
+        groups.push(current_group);
+    }
+
+    let mut total: u64 = 0;
+
+    for (group, op_str) in groups.iter().zip(operator_list) {
+        let operator = match op_str {
+            "+" => Operation::Add,
+            "*" => Operation::Multiply,
+            _ => continue,
+        };
+
+        let numbers: Vec<u64> = group.iter().filter_map(|s| s.trim().parse().ok()).collect();
+
+        let result: u64 = match operator {
+            Operation::Add => numbers.iter().sum(),
+            Operation::Multiply => numbers.iter().product(),
+        };
+
+        total += result;
+    }
+
+    Some(total)
 }
 
 #[cfg(test)]
@@ -62,6 +116,6 @@ mod tests {
     #[test]
     fn test_part_two() {
         let result = part_two(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, None);
+        assert_eq!(result, Some(3263827));
     }
 }
